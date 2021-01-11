@@ -46,14 +46,14 @@ std::string HasherMD5::adjustMessagePadding() {
 
     uint64_t len = message.size() * sizeof(char) * CHAR_BIT; // Length of message in bits
 
-    message += (char) (1 << (CHAR_BIT - 1)); // Add 10000000 to the end of message
+    message += static_cast<char>(1 << (CHAR_BIT - 1)); // Add 10000000 to the end of message
 
     while (message.size() * sizeof(char) * CHAR_BIT % DEFAULT_BLOCK_SIZE != 448) {
         message += FILLER;
     }
 
     for (int i = 0; i < sizeof(uint64_t); i++) {
-        message += (char) (len >> (CHAR_BIT * i)); // Add message length as little endian by byte
+        message += static_cast<char>(len >> (CHAR_BIT * i)); // Add message length as little endian by byte
     }
 
 
@@ -126,7 +126,7 @@ std::vector<uint32_t> HasherMD5::processNextBlock(std::vector<uint32_t> block, s
 
         std::vector<uint32_t> s;
 
-        if(k < 16) {
+        if (k < 16) {
 
             s.push_back(7);
             s.push_back(12);
@@ -134,41 +134,41 @@ std::vector<uint32_t> HasherMD5::processNextBlock(std::vector<uint32_t> block, s
             s.push_back(22);
 
             j = k;
-            result = f(wordBuffer[1],wordBuffer[2],wordBuffer[3]) + wordBuffer[0] + block[j] + t(k+1);
+            result = f(wordBuffer[1], wordBuffer[2], wordBuffer[3]) + wordBuffer[0] + block[j] + t(k + 1);
 
-        } else if(k < 32) {
+        } else if (k < 32) {
 
             s.push_back(5);
             s.push_back(9);
             s.push_back(14);
             s.push_back(20);
 
-            j = (5*k + 1)%16;
-            result = g(wordBuffer[1],wordBuffer[2],wordBuffer[3]) + wordBuffer[0] + block[j] + t(k+1);
-        } else if(k < 48) {
+            j = (5 * k + 1) % 16;
+            result = g(wordBuffer[1], wordBuffer[2], wordBuffer[3]) + wordBuffer[0] + block[j] + t(k + 1);
+        } else if (k < 48) {
 
             s.push_back(4);
             s.push_back(11);
             s.push_back(16);
             s.push_back(23);
 
-            j = (3*k + 5)%16;
-            result = h(wordBuffer[1],wordBuffer[2],wordBuffer[3]) + wordBuffer[0] + block[j] + t(k+1);
-        } else if(k < 64) {
+            j = (3 * k + 5) % 16;
+            result = h(wordBuffer[1], wordBuffer[2], wordBuffer[3]) + wordBuffer[0] + block[j] + t(k + 1);
+        } else if (k < 64) {
 
             s.push_back(6);
             s.push_back(10);
             s.push_back(15);
             s.push_back(21);
 
-            j = (7*k)%16;
-            result = i(wordBuffer[1],wordBuffer[2],wordBuffer[3]) + wordBuffer[0] + block[j] + t(k+1);
+            j = (7 * k) % 16;
+            result = i(wordBuffer[1], wordBuffer[2], wordBuffer[3]) + wordBuffer[0] + block[j] + t(k + 1);
         }
 
         wordBuffer[0] = wordBuffer[3];
         wordBuffer[3] = wordBuffer[2];
         wordBuffer[2] = wordBuffer[1];
-        wordBuffer[1] = wordBuffer[1] + utils::shiftLeft(result,s[k%4]);
+        wordBuffer[1] = wordBuffer[1] + utils::shiftLeft(result, s[k % 4]);
 
     }
 
@@ -176,7 +176,6 @@ std::vector<uint32_t> HasherMD5::processNextBlock(std::vector<uint32_t> block, s
 }
 
 std::ostream &operator<<(std::ostream &os, HasherMD5 &hasher) {
-    hasher.hashString();
     os << hasher.getHashedString();
     return os;
 }
@@ -184,7 +183,7 @@ std::ostream &operator<<(std::ostream &os, HasherMD5 &hasher) {
 std::istream &operator>>(std::istream &is, HasherMD5 &hasher) {
     std::string inputString;
     is >> inputString;
-    hasher.stringToHash += inputString;
+    hasher.hashString(inputString);
     return is;
 }
 
